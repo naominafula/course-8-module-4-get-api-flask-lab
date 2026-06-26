@@ -1,24 +1,35 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request
 
 app = Flask(__name__)
 
-# TODO: Implement homepage route that returns a welcome message
 
-@app.route("/")
+products = [
+    {"id": 1, "name": "Laptop", "price": 899.99, "category": "electronics"},
+    {"id": 2, "name": "Book", "price": 14.99, "category": "books"},
+    {"id": 3, "name": "Desk", "price": 199.99, "category": "furniture"},
+]
+
+@app.route('/')
 def home():
-    pass  # TODO: Return a welcome message
+    return {"message": "Welcome to the Products API!"}
 
-# TODO: Implement GET /products route that returns all products or filters by category
-
-@app.route("/products")
+@app.route('/products', methods=['GET'])
 def get_products():
-    pass  # TODO: Return all products or filter by ?category=
+    category_filter = request.args.get('category')
 
-# TODO: Implement GET /products/<id> route that returns a specific product by ID or 404
-
-@app.route("/products/<int:id>")
+    if category_filter:
+        filtered_products = [p for p in products if p['category'].lower() == category_filter.lower()]
+        return filtered_products
+    
+    return products
+@app.route('/products/<int:id>', methods=['GET'])
 def get_product_by_id(id):
-    pass  # TODO: Return product by ID or 404
+    product = next((p for p in products if p['id'] == id), None)
+    
+    if product:
+        return product
+    else:
+        return {"error": "Product not found"}, 404
 
 if __name__ == "__main__":
     app.run(debug=True)
